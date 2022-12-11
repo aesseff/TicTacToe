@@ -1,0 +1,91 @@
+@board = [
+  [0, 0, 0],
+  [0, 0, 0],
+  [0, 0, 0]
+]
+
+HUMAN = 'human'
+COMP = 'computer'
+
+def empty_cells(state)
+  [].tap do |cells|
+    state.each_with_index do |row, x|
+      row.each_with_index do |cell, y|
+        next if cell == HUMAN || cell == COMP
+        cells << [x, y] if cell.zero?
+      end
+    end
+  end
+end
+
+def set_move(x, y, player)
+
+  if empty_cells(@board).include? [x, y]
+    @board[x][y] = player
+    return true
+  end
+
+  false
+end
+
+def render(state, c_choice, h_choice)
+  state.each do |row|
+    puts "\n---------------"
+    row.each do |cell|
+      if cell == COMP
+        print "| #{c_choice} |"
+      elsif cell == HUMAN
+        print "| #{h_choice} |"
+      else
+        print "|   |"
+      end
+    end
+  end
+  puts "\n---------------"
+end
+
+def evaluate(state)
+  if wins(state, COMP)
+    1
+  elsif wins(state, HUMAN)
+    -1
+  else
+    0
+  end
+end
+
+def wins(state, player)
+  win_state = [
+    [state[0][0], state[0][1], state[0][2]],
+    [state[1][0], state[1][1], state[1][2]],
+    [state[2][0], state[2][1], state[2][2]],
+    [state[0][0], state[1][0], state[2][0]],
+    [state[0][1], state[1][1], state[2][1]],
+    [state[0][2], state[1][2], state[2][2]],
+    [state[0][0], state[1][1], state[2][2]],
+    [state[2][0], state[1][1], state[0][2]]
+  ]
+  win_state.include? [player, player, player]
+end
+
+def game_over(state)
+  wins(state, HUMAN) || wins(state, COMP)
+end
+
+turn = 0
+
+while (!game_over(@board)) do
+  player_turn = turn % 2 == 0 ? COMP : HUMAN
+
+  puts "What is the x for your move?"
+  x = gets
+
+  puts "What is the y for your move?"
+  y = gets
+
+  set_move(0, 1, player_turn)
+
+  turn += 1
+end
+
+render(@board, 'X', 'O')
